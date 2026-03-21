@@ -1,10 +1,10 @@
 const Event = require("../models/Event");
 const Layout = require("../models/Layout");
+const seatService = require("./seatService");
 
 const createEvent = async (data) => {
   const { eventName, layoutId, eventDate } = data;
 
-  // Validate that layoutId exists in layouts table
   const layout = await Layout.findById(layoutId);
   if (!layout) {
     const error = new Error("Layout not found");
@@ -12,7 +12,11 @@ const createEvent = async (data) => {
     throw error;
   }
 
-  return await Event.create(eventName, layoutId, eventDate);
+  const event = await Event.create(eventName, layoutId, eventDate);
+
+  await seatService.generateSeats(event.id, layout.layout_data);
+
+  return event;
 };
 
 const getAllEvents = async () => {
