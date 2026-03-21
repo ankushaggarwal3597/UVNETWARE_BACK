@@ -1,24 +1,38 @@
-const layout = require("../../layout.json");
-const seats = layout.seats;
-
+const EventSeat = require("../models/EventSeat");
 const lockManager = require("../utils/seatLockManager");
+const { pool } = require("../config/database");
 
+// ================= HOLD SEAT =================
 const holdSeat = async (eventId, seatId) => {
 
+  const seats = await EventSeat.findByEventId(eventId);
   const seat = seats.find(s => s.seatId === seatId);
 
   if (!seat)
     throw new Error("Seat not found");
 
-  const locked = await lockManager.isSeatLocked(eventId, seatId);
+  if (seat.status === "booked")
+    throw new Error("Seat already booked");
 
-  if (locked)
+  // ✅ Step 1: Lock in Redis
+  const locked = await lockManager.lockSeat(eventId, seatId);
+
+  if (!locked)
     throw new Error("Seat already locked");
 
-  const result = await lockManager.lockSeat(eventId, seatId);
+  // ✅ Step 2: Update DB
+  const result = await pool.query(
+    `UPDATE event_seats 
+     SET status='locked' 
+     WHERE event_id=$1 AND seat_id=$2 AND status='available'`,
+    [eventId, seatId]
+  );
 
-  if (!result)
-    throw new Error("Seat already locked");
+  // ❗ Rollback Redis lock if DB fails
+  if (result.rowCount === 0) {
+    await lockManager.unlockSeat(eventId, seatId);
+    throw new Error("Seat already taken");
+  }
 
   return {
     message: "Seat locked successfully",
@@ -26,8 +40,10 @@ const holdSeat = async (eventId, seatId) => {
   };
 };
 
+// ================= BOOK SEAT =================
 const bookSeat = async (eventId, seatId) => {
 
+  const seats = await EventSeat.findByEventId(eventId);
   const seat = seats.find(s => s.seatId === seatId);
 
   if (!seat)
@@ -38,9 +54,18 @@ const bookSeat = async (eventId, seatId) => {
   if (!locked)
     throw new Error("Seat not locked");
 
-  // later this will update DB
-  // for now we simulate booking
+  // ✅ Update DB only if currently locked
+  const result = await pool.query(
+    `UPDATE event_seats 
+     SET status='booked' 
+     WHERE event_id=$1 AND seat_id=$2 AND status='locked'`,
+    [eventId, seatId]
+  );
 
+  if (result.rowCount === 0)
+    throw new Error("Seat cannot be booked");
+
+  // ✅ Remove Redis lock
   await lockManager.unlockSeat(eventId, seatId);
 
   return {
@@ -49,14 +74,25 @@ const bookSeat = async (eventId, seatId) => {
   };
 };
 
+// ================= RELEASE SEAT =================
 const releaseSeat = async (eventId, seatId) => {
 
+  const seats = await EventSeat.findByEventId(eventId);
   const seat = seats.find(s => s.seatId === seatId);
 
   if (!seat)
     throw new Error("Seat not found");
 
+  // ✅ Remove Redis lock
   await lockManager.unlockSeat(eventId, seatId);
+
+  // ✅ Update DB
+  await pool.query(
+    `UPDATE event_seats 
+     SET status='available' 
+     WHERE event_id=$1 AND seat_id=$2`,
+    [eventId, seatId]
+  );
 
   return {
     message: "Seat released",

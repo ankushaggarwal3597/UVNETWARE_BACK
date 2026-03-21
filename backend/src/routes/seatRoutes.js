@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const seatController = require("../controllers/seatController");
+const seatController = require("../controllers/holdController");
 
 router.post("/hold", seatController.holdSeat);
 router.post("/book", seatController.bookSeat);
