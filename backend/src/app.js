@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
-// const { connectDB } = require("./config/database");
+const { connectDB } = require("./config/database");
 const { connectRedis } = require("./config/redis");
 
 const seatRoutes = require("./routes/seatRoutes");
@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// connectDB();
+connectDB();
 connectRedis();
 
 app.use("/api/seats", seatRoutes);
