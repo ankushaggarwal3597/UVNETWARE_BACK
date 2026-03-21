@@ -8,3 +8,5 @@ router.post("/book", seatController.bookSeat);
 router.delete("/release", seatController.releaseSeat);
 
 module.exports = router;
+
+
