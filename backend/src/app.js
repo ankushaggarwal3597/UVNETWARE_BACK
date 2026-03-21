@@ -20,7 +20,7 @@ connectDB();
 
 app.use("/api/layouts", layoutRoutes);
 app.use("/api/events", eventRoutes);
-app.use("/api/seats", seatRoutes);
+app.use("/api/events", seatRoutes);
 
 app.get("/", (req, res) => {
   res.send("UVNetware Backend Running");
