@@ -1,8 +1,8 @@
 const { redisClient } = require("../config/redis");
 
-const lockSeat = async (eventId, seatId) => {
+const lockSeat = async (layoutId, seatId) => { 
 
-  const key = `seat_lock:${eventId}:${seatId}`;
+  const key = `seat_lock:${layoutId}:${seatId}`; 
 
   const result = await redisClient.set(key, "locked", {
     NX: true,
@@ -12,16 +12,16 @@ const lockSeat = async (eventId, seatId) => {
   return result;
 };
 
-const unlockSeat = async (eventId, seatId) => {
+const unlockSeat = async (layoutId, seatId) => { 
 
-  const key = `seat_lock:${eventId}:${seatId}`;
+  const key = `seat_lock:${layoutId}:${seatId}`; 
 
   await redisClient.del(key);
 };
 
-const isSeatLocked = async (eventId, seatId) => {
+const isSeatLocked = async (layoutId, seatId) => { 
 
-  const key = `seat_lock:${eventId}:${seatId}`;
+  const key = `seat_lock:${layoutId}:${seatId}`; 
 
   return await redisClient.exists(key);
 };
