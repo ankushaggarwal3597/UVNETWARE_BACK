@@ -1,10 +1,11 @@
 const seatService = require("../services/holdService");
 
+//hold seat
 const holdSeat = async (req, res, next) => {
   try {
-    const { eventId, seatId } = req.body;
+    const { layoutId, seatId } = req.body; 
 
-    const result = await seatService.holdSeat(eventId, seatId);
+    const result = await seatService.holdSeat(layoutId, seatId); 
 
     res.json(result);
   } catch (err) {
@@ -12,11 +13,12 @@ const holdSeat = async (req, res, next) => {
   }
 };
 
+//book seat
 const bookSeat = async (req, res, next) => {
   try {
-    const { eventId, seatId } = req.body;
+    const { layoutId, seatId } = req.body; 
 
-    const result = await seatService.bookSeat(eventId, seatId);
+    const result = await seatService.bookSeat(layoutId, seatId); 
 
     res.json(result);
   } catch (err) {
@@ -24,11 +26,13 @@ const bookSeat = async (req, res, next) => {
   }
 };
 
+
+//release seat
 const releaseSeat = async (req, res, next) => {
   try {
-    const { eventId, seatId } = req.body;
+    const { layoutId, seatId } = req.body; 
 
-    const result = await seatService.releaseSeat(eventId, seatId);
+    const result = await seatService.releaseSeat(layoutId, seatId); 
 
     res.json(result);
   } catch (err) {

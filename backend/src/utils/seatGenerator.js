@@ -1,11 +1,11 @@
-const generateSeatsFromLayout = (eventId, layoutData) => {
+const generateSeatsFromLayout = (layoutId, layoutData) => { 
   const seats = [];
 
   layoutData.sections.forEach((section) => {
     section.rows.forEach((row) => {
       row.seats.forEach((seat) => {
         seats.push({
-          eventId,
+          layoutId, // changed
           seatId: seat.seatId,
           section: section.sectionId,
           row: row.rowId,
