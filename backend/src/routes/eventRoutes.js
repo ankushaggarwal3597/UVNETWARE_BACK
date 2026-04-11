@@ -9,6 +9,14 @@ const seatController = require("../controllers/seatController");
 router.post("/", validateRequest(eventSchema), eventController.createEvent);
 router.get("/", eventController.getEvents);
 router.get("/:id", eventController.getEventById);
-router.get("/:eventId/seat-map", seatController.getSeatMap);
+router.get("/:eventId/seat-map", async (req, res, next) => {
+  try {
+    const event = await eventService.getEventById(req.params.eventId);
+    const seats = await seatService.getSeatMap(event.layoutId);
+    res.json(seats);
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;

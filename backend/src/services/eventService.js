@@ -12,9 +12,30 @@ const createEvent = async (data) => {
     throw error;
   }
 
-  const event = await Event.create(eventName, layoutId, eventDate);
+  const originalLayout = await Layout.findById(layoutId);
 
-  await seatService.generateSeats(event.id, layout.layout_data);
+  if (!originalLayout) {
+    const error = new Error("Layout not found");
+    error.status = 404;
+    throw error;
+  }
+
+  // clone layout
+  const newLayout = await Layout.create(
+    originalLayout.layout_name,
+    originalLayout.layout_type,
+    originalLayout.layout_data
+  );
+
+  // create event with new layoutId
+  const event = await Event.create(
+    eventName,
+    newLayout.id,
+    eventDate
+  );
+
+  // generate seats for new layout
+  await seatService.generateSeats(newLayout.id);
 
   return event;
 };
