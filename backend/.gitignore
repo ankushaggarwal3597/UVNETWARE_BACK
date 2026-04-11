@@ -1,11 +1,36 @@
+# dependencies
 node_modules/
+
+# env files (VERY IMPORTANT)
 .env
 .env.local
 .env.development
 .env.production
 
+# logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-.vscode/
+# OS files
 .DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+
+# build
+dist/
+build/
+
+# coverage
+coverage/
+
+# knex / db
+*.sqlite3
+
+# optional (if you add later)
+*.pem
+*.key
