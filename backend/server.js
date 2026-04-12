@@ -2,23 +2,37 @@ require("dotenv").config();
 
 const http = require("http");
 const app = require("./src/app");
+const runMigrations = require("./src/config/migrate");
 
 const { Server } = require("socket.io");
 
 const PORT = process.env.PORT || 5000;
 
-const server = http.createServer(app);
+const startServer = async () => {
+  try {
+    // 🔥 Run migrations first
+    await runMigrations();
 
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
-});
+    const server = http.createServer(app);
 
-io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
-});
+    const io = new Server(server, {
+      cors: {
+        origin: "*",
+      },
+    });
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    io.on("connection", (socket) => {
+      console.log("Client connected:", socket.id);
+    });
+
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+
+  } catch (err) {
+    console.error("❌ Failed to start server:", err);
+    process.exit(1);
+  }
+};
+
+startServer();

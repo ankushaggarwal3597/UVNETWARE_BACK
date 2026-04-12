@@ -1,20 +1,21 @@
 const { Pool } = require("pg");
 
 const pool = new Pool({
-  host: process.env.DB_HOST || "localhost",
-  port: process.env.DB_PORT || 5432,
-  password: process.env.DB_PASSWORD || "shreya26",
-  user: process.env.DB_USER || "postgres",
-  database: process.env.DB_NAME || "uvnetware",
+  connectionString: process.env.DATABASE_URL,
+
+  // 🔥 REQUIRED for Supabase
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 const connectDB = async () => {
   try {
     const client = await pool.connect();
-    console.log("PostgreSQL Connected");
+    console.log("✅ PostgreSQL Connected (Supabase)");
     client.release();
   } catch (error) {
-    console.error("Database connection failed:", error.message);
+    console.error("❌ Database connection failed:", error.message);
     process.exit(1);
   }
 };
