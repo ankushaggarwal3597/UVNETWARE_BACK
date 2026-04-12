@@ -5,9 +5,12 @@ const eventController = require("../controllers/eventController");
 const eventSchema = require("../schemas/eventSchema");
 const validateRequest = require("../middlewares/validation");
 const seatController = require("../controllers/seatController");
+const auth = require('../middlewares/auth');
+const eventService = require("../services/eventService");
+const seatService = require("../services/seatService");
 
 router.post("/", validateRequest(eventSchema), eventController.createEvent);
-router.get("/", eventController.getEvents);
+router.get("/", auth, eventController.getEvents);
 router.get("/:id", eventController.getEventById);
 router.get("/:eventId/seat-map", async (req, res, next) => {
   try {
