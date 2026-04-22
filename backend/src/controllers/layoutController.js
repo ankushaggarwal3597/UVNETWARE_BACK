@@ -30,9 +30,21 @@ const getLayoutById = async (req, res, next) => {
     next(err);
   }
 };
+const updateLayoutWithSeats = async (req, res, next) => {
+  try {
+    const result = await layoutService.updateLayoutWithSeats(
+      req.params.id,
+      req.body
+    );
 
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
 module.exports = {
   saveLayout,
   getLayouts,
   getLayoutById,
+  updateLayoutWithSeats,
 };

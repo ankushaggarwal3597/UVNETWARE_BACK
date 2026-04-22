@@ -26,5 +26,5 @@ router.post(
 
 // get seat map
 router.get("/:layoutId/seat-map", seatController.getSeatMap);
-
+router.put("/:id/update-with-regeneration", layoutController.updateLayoutWithSeats);
 module.exports = router;
